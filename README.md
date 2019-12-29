@@ -1,6 +1,5 @@
-# alfred
-
-Alfred is a mobile app which helps predict different genres of TV Shows or Movies by just they&#x27;re poster
+# Alfred
+Alfred is a mobile app which helps predict different genres of TV Shows or Movies by just they're poster
 
 ## Getting Started
 
