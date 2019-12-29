@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'main.dart';
 import 'accounts.dart';
 import 'home.dart';
 
@@ -60,6 +59,7 @@ class LoginState extends State<Login>{
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 36,
+                  fontFamily: "Google Sans"
                 ),
               ),
               SizedBox(
@@ -72,7 +72,9 @@ class LoginState extends State<Login>{
                 child: Text(
                   "Alfred is a mobile app which helps predict different genres of TV Shows or Movies by just they're poster",
                   style: TextStyle(
-                    fontSize: 18
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontFamily: "Google Sans"
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -100,7 +102,8 @@ class LoginState extends State<Login>{
                       decoration: InputDecoration(
                         labelText: 'Name',
                         labelStyle: TextStyle(
-                          color: theme
+                          color: theme,
+                          fontFamily: "Google Sans"
                         )
                       ),
                       controller: nameController,
@@ -120,7 +123,8 @@ class LoginState extends State<Login>{
                       decoration: InputDecoration(
                         labelText: 'Username',
                         labelStyle: TextStyle(
-                          color: theme
+                          color: theme,
+                          fontFamily: "Google Sans"
                         )
                       ),
                       controller: usernameController,
