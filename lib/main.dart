@@ -52,7 +52,6 @@ class AppState extends State<App>{
       home: FutureBuilder(
         future: getNumberOfRecords(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
-          print(snapshot.data);
           if(snapshot.data == 0){
             return Login();
           }

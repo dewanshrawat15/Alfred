@@ -11,6 +11,8 @@ dependencies:
   cupertino_icons: ^0.1.2
   sqflite: any
   path: any
+  image_picker: any
+  http: any
 
 dev_dependencies:
   flutter_test:

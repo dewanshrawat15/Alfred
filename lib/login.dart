@@ -22,6 +22,31 @@ class LoginState extends State<Login>{
   FocusNode nameFocusNode = new FocusNode();
   FocusNode usernameFocusNode = new FocusNode();
 
+  showAlertDialog(context){
+    Widget okButton = FlatButton(
+      textColor: Colors.orange,
+      child: Text("OK"),
+      onPressed: (){
+        Navigator.pop(context);
+      },
+    );
+    AlertDialog alert = AlertDialog(
+      title: Text("Alert"),
+      content: Text("Please fill in your details."),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return alert;
+      }
+    );
+  }
+
   connectDatabase() async{
     Future<Database> database = openDatabase(
       join(await getDatabasesPath(), 'database.db'),
@@ -144,13 +169,18 @@ class LoginState extends State<Login>{
           Person tempProfile = new Person();
           tempProfile.name = nameController.text;
           tempProfile.username = usernameController.text;
-          createProfile(tempProfile);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => Home()
-            )
-          );
+          if(tempProfile.name.length > 0 && tempProfile.username.length > 0){
+            createProfile(tempProfile);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => Home()
+              )
+            );
+          }
+          else{
+            showAlertDialog(context);
+          }
         },
         child: Icon(
           Icons.chevron_right,
