@@ -1,10 +1,14 @@
-import 'package:alfred/login.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+
+import 'login.dart';
 import 'api.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
 
 class Home extends StatefulWidget{
   
@@ -39,6 +43,37 @@ class HomeState extends State<Home>{
     var data = await http.get(apiEndpoint);
     var result = json.decode(data.body.toString());
     return result["results"];
+  }
+
+  File imageFile;
+
+  Future getImageFromCamera() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      imageFile = image;
+    });
+  }
+
+  fetchResults() async{
+    var stream = http.ByteStream.fromBytes(imageFile.readAsBytesSync());
+    var length = await imageFile.length();
+    var uri = Uri.parse(modelEndpointAPI);
+
+    var request = new http.MultipartRequest("POST", uri);
+    var multipartFile = new http.MultipartFile('image', stream, length, filename: basename(imageFile.path));
+    request.files.add(multipartFile);
+    var response = await request.send();
+    print(response.statusCode);
+
+  }
+
+  Future getImageFromGallery() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      imageFile = image;
+    });
   }
 
   fetchShows() async{
@@ -124,6 +159,9 @@ class HomeState extends State<Home>{
                             ),
                           );
                         }
+                        else{
+                          return null;
+                        }
                       },
                     );
                   }
@@ -179,6 +217,9 @@ class HomeState extends State<Home>{
                             ),
                           );
                         }
+                        else{
+                          return null;
+                        }
                       },
                     );
                   }
@@ -199,10 +240,8 @@ class HomeState extends State<Home>{
                   }
                 },
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 42
-                ),
+              SizedBox(
+                height: 150,
               )
             ],
           ),
@@ -214,8 +253,11 @@ class HomeState extends State<Home>{
         children: <Widget>[
           FloatingActionButton(
             heroTag: 'From Gallery',
-            onPressed: (){
-              // pick image from gallery
+            onPressed: () async {
+              if(imageFile != null){
+                await fetchResults();
+                print("Recieved gallery results");
+              }
             },
             backgroundColor: Colors.orange,
             child: Icon(
@@ -227,9 +269,12 @@ class HomeState extends State<Home>{
             height: 24,
           ),
           FloatingActionButton(
-            heroTag: 'From Gallery',
-            onPressed: (){
-              // upload image from camera
+            heroTag: 'From Camera',
+            onPressed: () async {
+              getImageFromCamera();
+              print("Camera request");
+              await fetchResults();
+              print("Recieved camera results");
             },
             backgroundColor: Colors.orange,
             child: Icon(
