@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 
 import 'login.dart';
 import 'api.dart';
+import 'results.dart';
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
@@ -47,39 +49,29 @@ class HomeState extends State<Home>{
 
   File imageFile;
 
-  Future getImageFromCamera() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
-
-    setState(() {
-      imageFile = image;
-    });
-  }
-
-  fetchResults() async{
-    var stream = http.ByteStream.fromBytes(imageFile.readAsBytesSync());
-    var length = await imageFile.length();
-    var uri = Uri.parse(modelEndpointAPI);
-
-    var request = new http.MultipartRequest("POST", uri);
-    var multipartFile = new http.MultipartFile('image', stream, length, filename: basename(imageFile.path));
-    request.files.add(multipartFile);
-    var response = await request.send();
-    print(response.statusCode);
-
-  }
-
-  Future getImageFromGallery() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      imageFile = image;
-    });
-  }
-
   fetchShows() async{
     var data = await http.get(tvShowsEndpoint);
     var result = json.decode(data.body.toString());
     return result["results"];
+  }
+
+  fetchResults(BuildContext context) async{
+    var bytes = imageFile.readAsBytesSync();
+    Map data = {
+      'image': base64.encode(bytes)
+    };
+    var response = await http.post(
+      modelEndpointAPI,
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: json.encode(data)
+    );
+    var jsonResponse = json.decode(response.body.toString());
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => ResultScreen(results: jsonResponse, imageFile: imageFile,)
+      )
+    );
   }
 
   @override
@@ -254,10 +246,11 @@ class HomeState extends State<Home>{
           FloatingActionButton(
             heroTag: 'From Gallery',
             onPressed: () async {
-              if(imageFile != null){
-                await fetchResults();
-                print("Recieved gallery results");
-              }
+              var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+              setState(() {
+                imageFile = image;
+              });
+              fetchResults(context);
             },
             backgroundColor: Colors.orange,
             child: Icon(
@@ -271,10 +264,11 @@ class HomeState extends State<Home>{
           FloatingActionButton(
             heroTag: 'From Camera',
             onPressed: () async {
-              getImageFromCamera();
-              print("Camera request");
-              await fetchResults();
-              print("Recieved camera results");
+              var image = await ImagePicker.pickImage(source: ImageSource.camera);
+              setState(() {
+                imageFile = image;
+              });
+              fetchResults(context);
             },
             backgroundColor: Colors.orange,
             child: Icon(
